@@ -7,8 +7,16 @@ name = "pip_conf_index_global"
 flask = "*"
 python-dotenv = "*"
 watchdog = "*"
+flask-sqlalchemy = "*"
+flask-mail = "*"
+apscheduler = "*"
+flask-migrate = "*"
+wtforms-validators = "*"
+wtforms = "*"
+email-validator = "*"
 
 [dev-packages]
+watchdog = "*"
 
 [requires]
 python_version = "3.13"

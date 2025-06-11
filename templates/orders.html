@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}订单管理<{% endblock %}
+{% block content %}
+<h1 class="mb-4">订单管理</h1>
+
+<!-- 状态筛选 -->
+<div class="mb-3">
+    <select class="form-select">
+        <option selected>全部订单</option>
+        <option>待处理</option>
+        <option>已发货</option>
+        <option>已完成</option>
+    </select>
+</div>
+
+<!-- 订单表格 -->
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>订单号</th>
+            <th>客户</th>
+            <th>类型</th>
+            <th>金额</th>
+            <th>状态</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.customer.usename }}</td>
+            <td>{{ order.type }}</td>
+            <td>¥{{ order.money }}</td>
+            <td><span class="badge {{ order.status|lower }}">{{ order.status }}</span></td>
+            <td>
+                <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#viewOrderModal{{ order.id }}">
+                    查看
+                </a>
+                <a href="#" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                    data-bs-target="#editOrderModal{{ order.id }}">
+                    编辑
+                </a>
+                <a href="#" class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                    data-bs-target="#deleteOrderModal{{ order.id }}">
+                    删除
+                </a>
+            </td>
+        </tr>
+
+        <!-- 查看订单模态框 -->
+        <div class="modal fade" id="viewOrderModal{{ order.id }}" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">订单详情</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h5>客户信息</h5>
+                        <p>名称：{{ order.customer.usename }}</p>
+                        <p>电话：{{ order.customer.pyone }}</p>
+                        <hr>
+                        <h5>订单内容</h5>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>商品</th>
+                                    <th>数量</th>
+                                    <th>单价</th>
+                                    <th>小计</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in order.Outorder_products %}
+                                <tr>
+                                    <td>{{ product.usename }}</td>
+                                    <td>1</td>
+                                    <td>¥{{ product.unitprice }}</td>
+                                    <td>¥{{ product.unitprice }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}供应商管理<{% endblock %}
+{% block content %}
+<h1 class="mb-4">供应商管理</h1>
+
+<!-- 新增供应商按钮 -->
+<a href="#" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
+    新增供应商
+</a>
+
+<!-- 供应商表格 -->
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>名称</th>
+            <th>联系人</th>
+            <th>电话</th>
+            <th>地址</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for supplier in suppliers %}
+        <tr>
+            <td>{{ supplier.usename }}</td>
+            <td>{{ supplier.linkman }}</td>
+            <td>{{ supplier.pyone }}</td>
+            <td>{{ supplier.address }}</td>
+            <td>
+                <a href="#" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                    data-bs-target="#editSupplierModal{{ supplier.id }}">
+                    编辑
+                </a>
+                <a href="#" class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                    data-bs-target="#deleteSupplierModal{{ supplier.id }}">
+                    删除
+                </a>
+            </td>
+        </tr>
+
+        <!-- 编辑模态框 -->
+        <div class="modal fade" id="editSupplierModal{{ supplier.id }}" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">编辑供应商</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3">
+                                <label>名称</label>
+                                <input type="text" class="form-control" value="{{ supplier.usename }}">
+                            </div>
+                            <div class="mb-3">
+                                <label>联系人</label>
+                                <input type="text" class="form-control" value="{{ supplier.linkman }}">
+                            </div>
+                            <div class="mb-3">
+                                <label>电话</label>
+                                <input type="text" class="form-control" value="{{ supplier.pyone }}">
+                            </div>
+                            <div class="mb-3">
+                                <label>地址</label>
+                                <input type="text" class="form-control" value="{{ supplier.address }}">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary">保存</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 删除模态框 -->
+        <div class="modal fade" id="deleteSupplierModal{{ supplier.id }}" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">确认删除</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        确定要删除供应商 {{ supplier.usename }} 吗？
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-danger">删除</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- 新增供应商模态框 -->
+<div class="modal fade" id="addSupplierModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">新增供应商</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label>名称</label>
+                        <input type="text" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>联系人</label>
+                        <input type="text" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>电话</label>
+                        <input type="text" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>地址</label>
+                        <input type="text" class="form-control" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

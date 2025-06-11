@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}产品管理<{% endblock %}
+{% block content %}
+<h1 class="mb-4">产品管理</h1>
+
+<!-- 新增产品按钮 -->
+<a href="#" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addProductModal">
+    新增产品
+</a>
+
+<!-- 产品表格 -->
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>名称</th>
+            <th>规格</th>
+            <th>单价</th>
+            <th>供应商</th>
+            <th>当前库存</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in products %}
+        <tr>
+            <td>{{ product.usename }}</td>
+            <td>{{ product.standard }}</td>
+            <td>¥{{ product.unitprice }}</td>
+            <td>{{ product.Outproduct_supply.usename }}</td>
+            <td>{{ product.inventory_quantity }}</td>
+            <td>
+                <a href="#" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                    data-bs-target="#editProductModal{{ product.id }}">
+                    编辑
+                </a>
+                <a href="#" class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                    data-bs-target="#deleteProductModal{{ product.id }}">
+                    删除
+                </a>
+            </td>
+        </tr>
+
+        <!-- 编辑模态框 -->
+        <div class="modal fade" id="editProductModal{{ product.id }}" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">编辑产品</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3">
+                                <label>名称</label>
+                                <input type="text" class="form-control" value="{{ product.usename }}">
+                            </div>
+                            <div class="mb-3">
+                                <label>规格</label>
+                                <input type="text" class="form-control" value="{{ product.standard }}">
+                            </div>
+                            <div class="mb-3">
+                                <label>单价</label>
+                                <input type="number" step="0.01" class="form-control" value="{{ product.unitprice }}">
+                            </div>
+                            <div class="mb-3">
+                                <label>供应商</label>
+                                <select class="form-select">
+                                    {% for supplier in suppliers %}
+                                    <option {{ 'selected' if product.Outproduct_supply.id==supplier.id else '' }}>
+                                        {{ supplier.usename }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary">保存</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 删除模态框 -->
+        <div class="modal fade" id="deleteProductModal{{ product.id }}" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">确认删除</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        确定要删除产品 {{ product.usename }} 吗？
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-danger">删除</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- 新增产品模态框 -->
+<div class="modal fade" id="addProductModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">新增产品</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label>名称</label>
+                        <input type="text" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>规格</label>
+                        <input type="text" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>单价</label>
+                        <input type="number" step="0.01" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>供应商</label>
+                        <select class="form-select" required>
+                            <option disabled selected>请选择供应商</option>
+                            {% for supplier in suppliers %}
+                            <option>{{ supplier.usename }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

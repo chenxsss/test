@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}首页{% endblock %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-success text-white text-center p-3">
+            <h3>总库存量</h3>
+            <p>{{ total_inventory }}</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white text-center p-3">
+            <h3>待处理订单</h3>
+            <p>{{ pending_orders }}</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white text-center p-3">
+            <h3>低库存预警</h3>
+            <p>{{ low_stock_count }}</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-primary text-white text-center p-3">
+            <h3>本月销售额</h3>
+            <p>暂未开通功能</p>
+        </div>
+    </div>
+</div>
+
+<!-- 近期订单快照 -->
+<h2 class="mb-3">近期订单</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>订单号</th>
+            <th>客户</th>
+            <th>金额</th>
+            <th>状态</th>
+            <th>创建时间</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in recent_orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.customer.usename }}</td>
+            <td>¥{{ order.money }}</td>
+            <td><span class="badge {{ order.status|lower }}">{{ order.status }}</span></td>
+            <td>{{ order.create_time.strftime('%Y-%m-%d') }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,20 @@
+/* 自定义样式 */
+.badge {
+    text-transform: capitalize;
+}
+
+.badge.success {
+    background-color: #198754;
+}
+
+.badge.warning {
+    background-color: #ffc107;
+}
+
+.badge.danger {
+    background-color: #dc3545;
+}
+
+.modal-dialog.modal-lg {
+    max-width: 80%;
+}

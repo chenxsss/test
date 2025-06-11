@@ -1,0 +1,9 @@
+.sidebar {
+    padding-top: 20px;
+    height: calc(100vh - 56px);
+    border-right: 1px solid #ddd;
+}
+
+.table-responsive {
+    margin-bottom: 2rem;
+}
