@@ -2,11 +2,11 @@ from flask import Flask,session,g,render_template,redirect,url_for,flash
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
 import config
-from  exts import db,mail,scheduler
+from  exts import db,mail
 from decorators import login_required
 from blueprints.qa import bp as qabp
 from blueprints.auth import bp as authbp
-from models import UserModel,ProductsModel,InventoryModel,OrdersModel
+from models import UserModel,InventoryModel,OrdersModel
 from sqlalchemy import func
 from datetime import datetime, timedelta
 app = Flask(__name__)
