@@ -1,6 +1,7 @@
 from flask import Blueprint,jsonify,url_for,session,g,flash
 from flask import render_template,redirect,request
 from exts import mail,db
+from forms import LoginForm
 from flask_mail import Message
 from models import UserModel,EmailCaptchaModel
 from forms import RegisterForm,LoginForm
@@ -9,96 +10,96 @@ from email_validator import validate_email, EmailNotValidError
 import random,string
 bp = Blueprint("auth",__name__,url_prefix="/auth")
 
-
-@bp.route("/login",methods=['GET','POST'])
-def login():
-    if request.method == 'GET':
-        return render_template("login.html")
-    else:
-        form = LoginForm(request.form)
-        if form.validate():
-            emai_user=form.email.data
-            password = form.password.data
-            if '@' in emai_user:
-                user = UserModel.query.filter_by(email = emai_user).first()      
-            else:
-                user = UserModel.query.filter_by(username = emai_user).first()
-            if not user:
-                print("非法用户或者邮箱登录")
-                flash("用户不存在",'error')
-                return redirect(url_for('auth.login'))#后期改成消息闪现的形式
-            if check_password_hash(user.password,password):
-                #cookie
-                # 不适合存放太多的数据，只适合存少量
-                # 一般用来存储登录授权的东西
-                # flask中的session是经过加密存储在cookie中的,需要
-                session['user_id']=user.id
-                return redirect(url_for("index"))
-
-            else :
-                print("密码错误")
-                flash('密码错误','error')
-                return redirect(url_for("auth.login"))
-
-        else:
-            print(form.errors)
-            flash(f'{form.errors}','error')
-            return redirect(url_for("auth.login"))
-
-
-
-
-
-@bp.route("/register",methods=['GET','POST'])
+@bp.route("/register", methods=['GET','POST'])
 def register():
-    if request.method== 'GET':
-        return render_template("register.html") 
-    else:
-        form = RegisterForm(request.form)
-        if form.validate():
-            email = form.email.data
-            username = form.username.data
-            password = form.password.data        
-            user = UserModel(email = email,username = username,password = generate_password_hash(password))
-                                                                     #密码不能明文存储，所以这里用自带加密
-            db.session.add(user)
-            db.session.commit()
-            flash("注册成功",'success')
-            return  redirect(url_for("auth.login"))
-        else:
-            print(form.errors)
-            flash(f"{form.errors}",'error')
-            return redirect(url_for("auth.register"))
+    form = RegisterForm()
     
+    # 检查表单提交
+    if form.validate_on_submit():
+        email = form.email.data
+        username = form.username.data
+        password = form.password.data        
+        user = UserModel(
+            email=email,
+            username=username,
+            password=generate_password_hash(password)  # 正确加密密码
+        )
+        db.session.add(user)
+        db.session.commit()
+        flash("注册成功", 'success')
+        # ✅ 修复：移除 form 参数
+        return redirect(url_for("auth.login"))  
+    
+    # 显示错误信息
+    if form.errors:
+        print(form.errors)
+        flash(f"{form.errors}", 'error')
+    
+    # 渲染注册表单（GET请求或验证失败时）
+    return render_template("register.html", form=form) 
+
+@bp.route("/login", methods=['GET', 'POST'])
+def login():
+    # 如果已登录，重定向到首页
+    if session.get('user_id'):
+        return redirect(url_for('index'))
+    
+    form = LoginForm()
+    
+    # 检查表单提交
+    if form.validate_on_submit():
+        email_or_username = form.email.data
+        password = form.password.data
+        
+        # 根据输入查找用户
+        if '@' in email_or_username:
+            user = UserModel.query.filter_by(email=email_or_username).first()
+        else:
+            user = UserModel.query.filter_by(username=email_or_username).first()
+        
+        if not user:
+            flash("用户不存在", 'error')
+            # ✅ 返回重新渲染登录页面
+            return render_template("login.html", form=form)
+        
+        # ✅ 验证密码（假设使用了正确的哈希）
+        if check_password_hash(user.password, password):
+            session['user_id'] = user.id
+            flash("登录成功", 'success')
+            # ✅ 修复：移除 form 参数
+            return redirect(url_for("index"))  
+        else:
+            flash('密码错误', 'error')
+            # ✅ 返回重新渲染登录页面
+            return render_template("login.html", form=form)
+    
+    # 渲染登录表单（GET请求或验证失败时）
+    return render_template("login.html", form=form)
+@bp.route("/logout")
+def outlogin():
+    session.clear()
+    return redirect("/") 
+
 @bp.route("/captcha/email")
 def get_email_captcha():
-   # email = request.args.get("mail")
-    email = request.args.get("email","").strip()
+    email = request.args.get("email", "").strip()
     if not email:
         return jsonify(code=400, message="邮箱参数不能为空")
+    
     try:
         valid = validate_email(email)
         email = valid.email
     except EmailNotValidError:
         return jsonify({"code": 400, "message": "邮箱格式无效"})
-    # source =string.digits*4
-    # captcha = random.sample(source,4)
-    # delemail =EmailCaptchaModel.query.filter_by(email=email)
-    # if delemail:
-    #     db.session.delete(delemail)
-    #     db.session.commit()
-    # captcha = "".join(captcha)
-    # message = Message(subject="秘贴验证码",recipients=[email],body=f"您的验证码是{captcha}")
-    # mail.send(message)
+
+    # 删除旧验证码
     old_records = EmailCaptchaModel.query.filter_by(email=email).all()
     if old_records:
         for record in old_records:
             db.session.delete(record)
     
-    # 生成4位数字验证码
+    # 生成验证码
     captcha = ''.join(random.choices(string.digits, k=4))
-    
-    # 保存到数据库
     email_captcha = EmailCaptchaModel(email=email, captcha=captcha)
     db.session.add(email_captcha)
     db.session.commit()
@@ -112,4 +113,5 @@ def get_email_captcha():
         mail.send(message)
     except Exception as e:
         return jsonify({"code": 500, "message": "邮件发送失败"})
-    return jsonify({"code":200,"message":"邮件发送成功"})
+    
+    return jsonify({"code": 200, "message": "邮件发送成功"})

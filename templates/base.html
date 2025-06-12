@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{% endblock %}</title>
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
     <!-- 自定义 CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
@@ -15,30 +15,121 @@
     <!-- 导航栏 -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('index') }}">经销存管理系统</a>
+            <a class="navbar-brand" href="{{ url_for('index') }}">进销存管理系统</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">首页</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('suppliers') }}">供应商管理</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('products') }}">产品管理</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('orders') }}">订单管理</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">登录</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('regist') }}">注册</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('qa.suppliers') }}">供应商管理</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('qa.products') }}">产品管理</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('qa.orders') }}">订单管理</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('qa.customers') }}">客户管理</a></li>
+                </ul>
+
+                <ul class="navbar-nav ms-auto">
+                    {% if user %}
+                    <!-- 用户已登录状态 -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <i class="bi bi-person-circle"></i> {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">个人中心</a></li>
+                            <li><a class="dropdown-item" href="#">账户设置</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="{{ url_for('auth.outlogin') }}">退出登录</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <!-- 用户未登录状态 -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.login') }}">登录</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.register') }}">注册</a>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
+
+    <!-- 消息提示区 -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="container mt-3">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
 
     <!-- 主体内容 -->
     <div class="container mt-4">
         {% block content %}{% endblock %}
     </div>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const captchaBtn = document.getElementById("captcha-btn");
+            if (captchaBtn) {
+                captchaBtn.addEventListener("click", function () {
+                    const emailInput = document.querySelector("input[name='email']");
+                    const email = emailInput ? emailInput.value.trim() : "";
+
+                    if (!email) {
+                        alert("请输入邮箱");
+                        return;
+                    }
+
+                    // 禁用按钮并启动倒计时
+                    let count = 60;
+                    captchaBtn.disabled = true;
+                    captchaBtn.textContent = `重新发送(${count}s)`;
+
+                    // 发送验证码请求
+                    fetch("{{ url_for('auth.get_email_captcha') }}?email=" + encodeURIComponent(email))
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.code !== 200) {
+                                alert("验证码发送失败：" + data.message);
+                                captchaBtn.disabled = false;
+                                captchaBtn.textContent = "获取验证码";
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                            alert("网络错误，请稍后再试");
+                            captchaBtn.disabled = false;
+                            captchaBtn.textContent = "获取验证码";
+                        });
+
+                    // 倒计时逻辑
+                    const timer = setInterval(() => {
+                        count--;
+                        if (count > 0) {
+                            captchaBtn.textContent = `重新发送(${count}s)`;
+                        } else {
+                            clearInterval(timer);
+                            captchaBtn.disabled = false;
+                            captchaBtn.textContent = "获取验证码";
+                        }
+                    }, 1000);
+                });
+            }
+        });
+    </script>
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
 </body>
 
 </html>

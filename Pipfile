@@ -10,10 +10,12 @@ watchdog = "*"
 flask-sqlalchemy = "*"
 flask-mail = "*"
 apscheduler = "*"
-flask-migrate = "*"
 wtforms-validators = "*"
 wtforms = "*"
 email-validator = "*"
+pymysql = "*"
+flask-migrate = "*"
+flask-wtf = "*"
 
 [dev-packages]
 watchdog = "*"

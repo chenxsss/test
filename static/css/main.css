@@ -18,3 +18,48 @@
 .modal-dialog.modal-lg {
     max-width: 80%;
 }
+#captcha-btn:disabled {
+    background-color: #e9ecef;
+    border-color: #d6d6d6;
+    color: #6c757d;
+}
+/* 添加图标字体 */
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css");
+
+/* 表格样式优化 */
+.table th {
+    font-weight: 600;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+/* 状态标签样式 */
+.badge.待处理,
+.badge.待处理 {
+    background-color: #6c757d;
+    color: white;
+}
+
+.badge.已发货,
+.badge.已发货 {
+    background-color: #ffc107;
+    color: black;
+}
+
+.badge.已完成,
+.badge.已完成 {
+    background-color: #198754;
+    color: white;
+}
+
+/* 模态框内容居中 */
+.modal-content {
+    border-radius: 0.8rem;
+}
+
+/* 操作按钮间距 */
+.btn-group .btn {
+    margin-right: 5px;
+}

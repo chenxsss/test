@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}供应商管理<{% endblock %}
+{% block title %}供应商管理{% endblock %}
 {% block content %}
 <h1 class="mb-4">供应商管理</h1>
 
@@ -47,28 +47,33 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <form>
+                        <form method="POST" action="{{ url_for('qa.edit_supplier', supplier_id=supplier.id) }}">
+                            {{ form.csrf_token }}
                             <div class="mb-3">
                                 <label>名称</label>
-                                <input type="text" class="form-control" value="{{ supplier.usename }}">
+                                <input type="text" class="form-control" name="usename" value="{{ supplier.usename }}"
+                                    required>
                             </div>
                             <div class="mb-3">
                                 <label>联系人</label>
-                                <input type="text" class="form-control" value="{{ supplier.linkman }}">
+                                <input type="text" class="form-control" name="linkman" value="{{ supplier.linkman }}"
+                                    required>
                             </div>
                             <div class="mb-3">
                                 <label>电话</label>
-                                <input type="text" class="form-control" value="{{ supplier.pyone }}">
+                                <input type="text" class="form-control" name="pyone" value="{{ supplier.pyone }}"
+                                    required>
                             </div>
                             <div class="mb-3">
                                 <label>地址</label>
-                                <input type="text" class="form-control" value="{{ supplier.address }}">
+                                <input type="text" class="form-control" name="address" value="{{ supplier.address }}"
+                                    required>
                             </div>
+                            <button type="submit" class="btn btn-primary w-100">保存修改</button>
                         </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                        <button type="button" class="btn btn-primary">保存</button>
                     </div>
                 </div>
             </div>
@@ -87,7 +92,8 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                        <button type="button" class="btn btn-danger">删除</button>
+                        <a href="{{ url_for('qa.delete_supplier', supplier_id=supplier.id) }}"
+                            class="btn btn-danger">删除</a>
                     </div>
                 </div>
             </div>
@@ -105,28 +111,29 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form>
+                <form method="POST" action="{{ url_for('qa.add_supplier') }}">
+                    {{ form.csrf_token }}
                     <div class="mb-3">
                         <label>名称</label>
-                        <input type="text" class="form-control" required>
+                        <input type="text" class="form-control" name="usename" required>
                     </div>
                     <div class="mb-3">
                         <label>联系人</label>
-                        <input type="text" class="form-control" required>
+                        <input type="text" class="form-control" name="linkman" required>
                     </div>
                     <div class="mb-3">
                         <label>电话</label>
-                        <input type="text" class="form-control" required>
+                        <input type="text" class="form-control" name="pyone" required>
                     </div>
                     <div class="mb-3">
                         <label>地址</label>
-                        <input type="text" class="form-control" required>
+                        <input type="text" class="form-control" name="address" required>
                     </div>
+                    <button type="submit" class="btn btn-primary w-100">保存</button>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary">保存</button>
             </div>
         </div>
     </div>

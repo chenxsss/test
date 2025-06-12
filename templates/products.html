@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}产品管理<{% endblock %}
+{% block title %}产品管理{% endblock %}
 {% block content %}
 <h1 class="mb-4">产品管理</h1>
 
@@ -16,7 +16,6 @@
             <th>规格</th>
             <th>单价</th>
             <th>供应商</th>
-            <th>当前库存</th>
             <th>操作</th>
         </tr>
     </thead>
@@ -26,8 +25,7 @@
             <td>{{ product.usename }}</td>
             <td>{{ product.standard }}</td>
             <td>¥{{ product.unitprice }}</td>
-            <td>{{ product.Outproduct_supply.usename }}</td>
-            <td>{{ product.inventory_quantity }}</td>
+            <td>{{ product.supplier.usename if product.supplier else '无供应商' }}</td>
             <td>
                 <a href="#" class="btn btn-sm btn-warning" data-bs-toggle="modal"
                     data-bs-target="#editProductModal{{ product.id }}">
@@ -49,34 +47,39 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <form>
+                        <form method="POST" action="{{ url_for('qa.edit_product', product_id=product.id) }}">
+                            {{ form.csrf_token }}
                             <div class="mb-3">
                                 <label>名称</label>
-                                <input type="text" class="form-control" value="{{ product.usename }}">
+                                <input type="text" class="form-control" name="usename" value="{{ product.usename }}"
+                                    required>
                             </div>
                             <div class="mb-3">
                                 <label>规格</label>
-                                <input type="text" class="form-control" value="{{ product.standard }}">
+                                <input type="text" class="form-control" name="standard" value="{{ product.standard }}"
+                                    required>
                             </div>
                             <div class="mb-3">
                                 <label>单价</label>
-                                <input type="number" step="0.01" class="form-control" value="{{ product.unitprice }}">
+                                <input type="number" class="form-control" name="unitprice"
+                                    value="{{ product.unitprice }}" required>
                             </div>
                             <div class="mb-3">
                                 <label>供应商</label>
-                                <select class="form-select">
+                                <select class="form-select" name="supplier_id" required>
                                     {% for supplier in suppliers %}
-                                    <option {{ 'selected' if product.Outproduct_supply.id==supplier.id else '' }}>
-                                        {{ supplier.usename }}
+                                    <option value="{{ supplier.id }}" {{ 'selected' if supplier.id==product.supplier_id
+                                        }}>
+                                    
                                     </option>
                                     {% endfor %}
                                 </select>
                             </div>
+                            <button type="submit" class="btn btn-primary w-100">保存修改</button>
                         </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                        <button type="button" class="btn btn-primary">保存</button>
                     </div>
                 </div>
             </div>
@@ -95,7 +98,8 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                        <button type="button" class="btn btn-danger">删除</button>
+                        <a href="{{ url_for('qa.delete_product', product_id=product.id) }}"
+                            class="btn btn-danger">删除</a>
                     </div>
                 </div>
             </div>
@@ -113,33 +117,34 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form>
+                <form method="POST" action="{{ url_for('qa.add_product') }}">
+                    {{ form.csrf_token }}
                     <div class="mb-3">
                         <label>名称</label>
-                        <input type="text" class="form-control" required>
+                        <input type="text" class="form-control" name="usename" required>
                     </div>
                     <div class="mb-3">
                         <label>规格</label>
-                        <input type="text" class="form-control" required>
+                        <input type="text" class="form-control" name="standard" required>
                     </div>
                     <div class="mb-3">
                         <label>单价</label>
-                        <input type="number" step="0.01" class="form-control" required>
+                        <input type="number" class="form-control" name="unitprice" required>
                     </div>
                     <div class="mb-3">
                         <label>供应商</label>
-                        <select class="form-select" required>
+                        <select class="form-select" name="supplier_id" required>
                             <option disabled selected>请选择供应商</option>
                             {% for supplier in suppliers %}
-                            <option>{{ supplier.usename }}</option>
+                            <option value="{{ supplier.id }}">{{ supplier.usename }}</option>
                             {% endfor %}
                         </select>
                     </div>
+                    <button type="submit" class="btn btn-primary w-100">保存</button>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary">保存</button>
             </div>
         </div>
     </div>
